@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { WhatsAppAudioPlayer } from "@/components/ui/whatsapp-audio-player";
 import { Button } from "@/components/ui/button";
 import { Copy, Check, MessageSquare, ShieldAlert, Sparkles, Send, HelpCircle } from "lucide-react";
 
@@ -104,9 +105,13 @@ export default function Module3Auto() {
                       <MessageSquare className="w-4 h-4" />
                     </div>
                     <div className="flex-1 text-left space-y-3">
-                      <pre className="text-xs text-gray-200 font-sans whitespace-pre-wrap leading-normal select-all">
+                      <pre className="text-xs text-gray-200 font-sans whitespace-pre-wrap leading-normal select-all mb-4">
                         {steps[activeStep].message}
                       </pre>
+                      <WhatsAppAudioPlayer 
+                        textTranscript={steps[activeStep].message}
+                        senderName="Amanda" 
+                      />
                     </div>
                   </div>
                   

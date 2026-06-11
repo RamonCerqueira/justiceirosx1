@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Shield, Lock, User } from "lucide-react";
 import { USERS } from "@/lib/course-data";
+import { supabase } from "@/lib/supabase";
 
 interface LoginScreenProps {
   onLogin: (user: any) => void;
@@ -15,23 +16,39 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    setTimeout(() => {
-      const foundUser = USERS.find(
-        (u) => u.username === username.trim().toLowerCase() && u.password === password
-      );
+    try {
+      const { data, error: supabaseError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("username", username.trim().toLowerCase())
+        .eq("password", password)
+        .single();
 
-      if (foundUser) {
-        onLogin(foundUser);
+      if (supabaseError || !data) {
+        // Fallback to static users in memory in case seed/db push hasn't run yet
+        const foundUser = USERS.find(
+          (u) => u.username === username.trim().toLowerCase() && u.password === password
+        );
+
+        if (foundUser) {
+          onLogin(foundUser);
+        } else {
+          setError("Credenciais inválidas. O acesso é restrito.");
+        }
       } else {
-        setError("Credenciais inválidas. O acesso é restrito.");
+        onLogin(data);
       }
+    } catch (err) {
+      console.error("Authentication error:", err);
+      setError("Erro de conexão ao autenticar.");
+    } finally {
       setLoading(false);
-    }, 600);
+    }
   };
 
   return (

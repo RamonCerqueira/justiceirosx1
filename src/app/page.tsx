@@ -14,12 +14,13 @@ import { CourseDialog } from "@/components/admin/course-dialog";
 import { ModuleDialog } from "@/components/admin/module-dialog";
 import { CommunityView } from "@/components/dashboard/community-view";
 import { FAQView } from "@/components/dashboard/faq-view";
+import { StudentCRM } from "@/components/admin/student-crm";
 
 // Progress helper
 import { getStudentProgress } from "@/lib/progress";
 
 // Data
-import { STATIC_MODULES, STATIC_COURSES } from "@/lib/course-data";
+import { STATIC_MODULES, STATIC_COURSES, USERS } from "@/lib/course-data";
 
 // Icons
 import { Layers, Play, RefreshCw, PlusCircle, Award, CheckCircle } from "lucide-react";
@@ -285,6 +286,16 @@ export default function Page() {
         .neq("title", "___NON_EXISTENT_TITLE___");
       if (delCourseError) throw delCourseError;
 
+      // Clean up users if table exists
+      try {
+        await supabase
+          .from("users")
+          .delete()
+          .neq("username", "___NON_EXISTENT_USERNAME___");
+      } catch (err) {
+        console.warn("Could not clear users table, it might not exist yet:", err);
+      }
+
       // 2. Seed Courses
       const courseRows = STATIC_COURSES.map((c) => ({
         id: c.id,
@@ -314,9 +325,29 @@ export default function Page() {
         .insert(moduleRows);
       if (insModError) throw insModError;
 
+      // 4. Seed Users
+      try {
+        const userRows = USERS.map((u) => ({
+          username: u.username,
+          password: u.password,
+          name: u.name,
+          role: u.role,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }));
+        const { error: insUserError } = await supabase
+          .from("users")
+          .insert(userRows);
+        if (insUserError) {
+          console.warn("Could not seed users, schema changes may not be pushed yet:", insUserError);
+        }
+      } catch (err) {
+        console.warn("Could not insert into users table:", err);
+      }
+
       await fetchCourses();
       await fetchModules();
-      alert("Sucesso! O banco de dados foi populado com os Cursos e Módulos reais!");
+      alert("Sucesso! O banco de dados foi populado com os Cursos, Módulos e Usuários reais!");
     } catch (e) {
       console.error(e);
       alert("Erro ao popular o banco. Verifique as configurações e políticas do Supabase.");
@@ -375,6 +406,7 @@ export default function Page() {
           setSelectedCourseId(null);
           setCurrentTab("Dashboard");
         }}
+        isAdmin={isAdmin}
       />
 
       {/* Main Container */}
@@ -401,6 +433,9 @@ export default function Page() {
           ) : currentTab === "FAQ" ? (
             /* FAQ panel view */
             <FAQView />
+          ) : currentTab === "Alunos (CRM)" && isAdmin ? (
+            /* Student CRM dashboard */
+            <StudentCRM totalModulesCount={modules.length} />
           ) : (
             /* Dashboard Home Panel */
             <div className="space-y-10 max-w-7xl mx-auto">

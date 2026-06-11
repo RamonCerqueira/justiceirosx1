@@ -2,30 +2,32 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Bell, 
-  ExternalLink, 
-  Copy, 
-  Check, 
-  Terminal, 
-  Wrench, 
-  ShieldAlert, 
-  TrendingUp, 
+import {
+  Bell,
+  ExternalLink,
+  Copy,
+  Check,
+  Terminal,
+  Wrench,
+  ShieldAlert,
+  TrendingUp,
   TrendingDown,
-  Plus, 
-  Trash2, 
-  BookOpen, 
-  DollarSign, 
-  Users, 
-  Percent, 
+  Plus,
+  Trash2,
+  BookOpen,
+  DollarSign,
+  Users,
+  Percent,
   MessageSquare,
   ArrowUpRight,
   ArrowDownRight,
   Calendar,
-  AlertCircle
+  AlertCircle,
+  Activity
 } from "lucide-react";
 import { getStudentOperations, addStudentOperationEntry, deleteStudentOperationEntry, OperationEntry } from "@/lib/operations";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
+import { WhatsAppAudioPlayer } from "@/components/ui/whatsapp-audio-player";
 
 interface CommunityViewProps {
   currentUser: {
@@ -38,11 +40,11 @@ interface CommunityViewProps {
 export function CommunityView({ currentUser }: CommunityViewProps) {
   const [activeTab, setActiveTab] = useState<"operations" | "library" | "notices">("operations");
   const [copiedItemId, setCopiedItemId] = useState<string | null>(null);
-  
+
   // Private Operations State
   const [entries, setEntries] = useState<OperationEntry[]>([]);
   const [loadingOps, setLoadingOps] = useState(true);
-  
+
   // Form State
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formDate, setFormDate] = useState(() => {
@@ -120,7 +122,7 @@ export function CommunityView({ currentUser }: CommunityViewProps) {
         revenue: revenueVal
       });
       setEntries(updated);
-      
+
       // Reset form
       setFormSpend("");
       setFormLeads("");
@@ -299,11 +301,10 @@ Que o momento das refeições seja maravilhoso e saudável para o seu bebê!`,
           <Button
             variant="ghost"
             onClick={() => setActiveTab("operations")}
-            className={`h-10 px-4 rounded-xl text-xs font-bold uppercase tracking-wider border-0 cursor-pointer transition-all ${
-              activeTab === "operations" 
-                ? "bg-[#D4AF37] text-[#050914] hover:bg-[#D4AF37] hover:text-[#050914]" 
+            className={`h-10 px-4 rounded-xl text-xs font-bold uppercase tracking-wider border-0 cursor-pointer transition-all ${activeTab === "operations"
+                ? "bg-[#D4AF37] text-[#050914] hover:bg-[#D4AF37] hover:text-[#050914]"
                 : "text-gray-400 hover:text-white hover:bg-white/5"
-            }`}
+              }`}
           >
             <TrendingUp className="w-4 h-4 mr-1.5" />
             Minha Operação (Privada)
@@ -311,11 +312,10 @@ Que o momento das refeições seja maravilhoso e saudável para o seu bebê!`,
           <Button
             variant="ghost"
             onClick={() => setActiveTab("library")}
-            className={`h-10 px-4 rounded-xl text-xs font-bold uppercase tracking-wider border-0 cursor-pointer transition-all ${
-              activeTab === "library" 
-                ? "bg-[#D4AF37] text-[#050914] hover:bg-[#D4AF37] hover:text-[#050914]" 
+            className={`h-10 px-4 rounded-xl text-xs font-bold uppercase tracking-wider border-0 cursor-pointer transition-all ${activeTab === "library"
+                ? "bg-[#D4AF37] text-[#050914] hover:bg-[#D4AF37] hover:text-[#050914]"
                 : "text-gray-400 hover:text-white hover:bg-white/5"
-            }`}
+              }`}
           >
             <BookOpen className="w-4 h-4 mr-1.5" />
             Biblioteca de Funis & PDFs
@@ -323,11 +323,10 @@ Que o momento das refeições seja maravilhoso e saudável para o seu bebê!`,
           <Button
             variant="ghost"
             onClick={() => setActiveTab("notices")}
-            className={`h-10 px-4 rounded-xl text-xs font-bold uppercase tracking-wider border-0 cursor-pointer transition-all ${
-              activeTab === "notices" 
-                ? "bg-[#D4AF37] text-[#050914] hover:bg-[#D4AF37] hover:text-[#050914]" 
+            className={`h-10 px-4 rounded-xl text-xs font-bold uppercase tracking-wider border-0 cursor-pointer transition-all ${activeTab === "notices"
+                ? "bg-[#D4AF37] text-[#050914] hover:bg-[#D4AF37] hover:text-[#050914]"
                 : "text-gray-400 hover:text-white hover:bg-white/5"
-            }`}
+              }`}
           >
             <Bell className="w-4 h-4 mr-1.5" />
             Mural do Grupo
@@ -419,11 +418,10 @@ Que o momento das refeições seja maravilhoso e saudável para o seu bebê!`,
                   R$ {avgCPL.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </h4>
               </div>
-              <div className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border ${
-                avgCPL <= 1.00 ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" :
-                avgCPL <= 1.50 ? "text-yellow-400 bg-yellow-500/10 border-yellow-500/20" :
-                "text-red-400 bg-red-500/10 border-red-500/20"
-              }`}>
+              <div className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border ${avgCPL <= 1.00 ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" :
+                  avgCPL <= 1.50 ? "text-yellow-400 bg-yellow-500/10 border-yellow-500/20" :
+                    "text-red-400 bg-red-500/10 border-red-500/20"
+                }`}>
                 {avgCPL <= 1.00 ? "Ideal" : avgCPL <= 1.50 ? "Aceitável" : "Crítico"}
               </div>
             </Card>
@@ -436,10 +434,97 @@ Que o momento das refeições seja maravilhoso e saudável para o seu bebê!`,
                 </h4>
               </div>
               <div className="text-[10px] text-gray-500 font-bold bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">
-                Ticket: {totalSales > 0 ? `R$ ${(totalRevenue/totalSales).toFixed(2)}` : "-"}
+                Ticket: {totalSales > 0 ? `R$ ${(totalRevenue / totalSales).toFixed(2)}` : "-"}
               </div>
             </Card>
           </div>
+
+          {/* Gráfico de Evolução SVG */}
+          {entries.length > 0 && (
+            <Card className="bg-[#0b1221]/45 border-white/10 p-6 rounded-2xl text-left">
+              <h4 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
+                <Activity className="w-5 h-5 text-[#D4AF37]" /> Evolução Financeira (Últimos 7 Lançamentos)
+              </h4>
+              <p className="text-xs text-gray-400 mb-6">Comparativo diário de investimento em anúncios versus faturamento no Pix.</p>
+
+              <div className="w-full overflow-hidden">
+                {(() => {
+                  const chartData = [...entries]
+                    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                    .slice(-7);
+                  const maxVal = Math.max(...chartData.map(d => Math.max(d.spend, d.revenue)), 100) * 1.1;
+
+                  return (
+                    <svg viewBox="0 0 600 220" className="w-full h-auto text-gray-400">
+                      {/* Grid Lines */}
+                      {[0, 0.25, 0.5, 0.75, 1].map((ratio, idx) => {
+                        const y = 20 + (1 - ratio) * 140;
+                        const val = Math.round(maxVal * ratio);
+                        return (
+                          <g key={idx} className="opacity-40">
+                            <line x1="50" y1={y} x2="570" y2={y} stroke="rgba(255,255,255,0.08)" strokeDasharray="3,3" />
+                            <text x="10" y={y + 4} className="text-[10px] fill-gray-500 font-mono">R$ {val}</text>
+                          </g>
+                        );
+                      })}
+
+                      {/* Bars */}
+                      {chartData.map((data, idx) => {
+                        const x = 75 + idx * 70;
+                        const spendHeight = (data.spend / maxVal) * 140;
+                        const revenueHeight = (data.revenue / maxVal) * 140;
+                        const spendY = 160 - spendHeight;
+                        const revenueY = 160 - revenueHeight;
+
+                        let shortDate = data.date;
+                        try {
+                          const dObj = new Date(data.date + "T12:00:00");
+                          shortDate = dObj.toLocaleDateString("pt-BR", { day: '2-digit', month: '2-digit' });
+                        } catch (e) { }
+
+                        return (
+                          <g key={data.id}>
+                            <rect
+                              x={x}
+                              y={spendY}
+                              width="18"
+                              height={spendHeight}
+                              fill="rgba(239, 68, 68, 0.65)"
+                              rx="4"
+                              className="transition-all hover:fill-red-500 cursor-pointer"
+                            />
+                            <rect
+                              x={x + 22}
+                              y={revenueY}
+                              width="18"
+                              height={revenueHeight}
+                              fill="rgba(212, 175, 55, 0.85)"
+                              rx="4"
+                              className="transition-all hover:fill-[#e5c158] cursor-pointer"
+                            />
+                            <text x={x + 20} y="180" textAnchor="middle" className="text-[9px] fill-gray-400 font-mono">{shortDate}</text>
+                          </g>
+                        );
+                      })}
+
+                      <line x1="50" y1="160" x2="570" y2="160" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
+                    </svg>
+                  );
+                })()}
+              </div>
+
+              <div className="flex gap-4 items-center justify-center mt-4 text-[10px] text-gray-400">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 bg-red-500/60 border border-red-500/30 rounded-md"></div>
+                  <span>Investido (Ads)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 bg-[#D4AF37]/80 border border-[#D4AF37]/20 rounded-md"></div>
+                  <span>Faturamento (Pix)</span>
+                </div>
+              </div>
+            </Card>
+          )}
 
           {/* Add Entry & History Section */}
           <div className="space-y-4">
@@ -607,7 +692,7 @@ Que o momento das refeições seja maravilhoso e saudável para o seu bebê!`,
                         try {
                           const dateObj = new Date(entry.date + "T12:00:00");
                           formattedDate = dateObj.toLocaleDateString("pt-BR", { day: '2-digit', month: '2-digit', year: 'numeric' });
-                        } catch (e) {}
+                        } catch (e) { }
 
                         return (
                           <tr key={entry.id} className="hover:bg-white/2 transition-colors">
@@ -685,7 +770,7 @@ Que o momento das refeições seja maravilhoso e saudável para o seu bebê!`,
                   </div>
 
                   <p className="text-xs text-gray-300 leading-normal">{prod.description}</p>
-                  
+
                   <div className="text-[10px] text-gray-400 font-semibold border-l-2 border-[#D4AF37] pl-2 py-0.5">
                     {prod.stats}
                   </div>
@@ -716,12 +801,12 @@ Que o momento das refeições seja maravilhoso e saudável para o seu bebê!`,
 
                   {/* Audios scripts section */}
                   {prod.audios.length > 0 && (
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">Áudios para Voz Sintética (Minimax Audio)</span>
-                      <div className="space-y-2 max-h-36 overflow-y-auto pr-1">
+                      <div className="space-y-4 max-h-96 overflow-y-auto pr-1">
                         {prod.audios.map((aud, index) => (
-                          <div key={index} className="bg-white/3 border border-white/5 p-2.5 rounded-lg text-xs relative group">
-                            <div className="flex justify-between items-center mb-1">
+                          <div key={index} className="bg-white/3 border border-white/5 p-3 rounded-lg text-xs relative group space-y-2">
+                            <div className="flex justify-between items-center">
                               <span className="font-bold text-[10px] text-[#D4AF37] uppercase">{aud.step}</span>
                               <Button
                                 size="icon"
@@ -737,7 +822,11 @@ Que o momento das refeições seja maravilhoso e saudável para o seu bebê!`,
                                 )}
                               </Button>
                             </div>
-                            <p className="text-[11px] text-gray-300 leading-normal font-light">{aud.text}</p>
+                            <p className="text-[11px] text-gray-355 leading-normal font-light mb-2">{aud.text}</p>
+                            <WhatsAppAudioPlayer
+                              textTranscript={aud.text}
+                              senderName={prod.title.includes("Receitas") ? "Amanda" : "Beatriz"}
+                            />
                           </div>
                         ))}
                       </div>
@@ -747,13 +836,13 @@ Que o momento das refeições seja maravilhoso e saudável para o seu bebê!`,
 
                 {/* Download PDF & Link Buttons */}
                 <div className="mt-6 flex gap-3">
-                  <a 
-                    href={prod.downloadUrl} 
-                    target="_blank" 
+                  <a
+                    href={prod.downloadUrl}
+                    target="_blank"
                     rel="noreferrer"
                     className="flex-1"
                   >
-                    <Button 
+                    <Button
                       disabled={prod.downloadUrl === "#"}
                       className="w-full h-11 bg-white/5 hover:bg-white/10 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 border border-white/10 cursor-pointer transition-colors"
                     >
@@ -761,9 +850,9 @@ Que o momento das refeições seja maravilhoso e saudável para o seu bebê!`,
                     </Button>
                   </a>
                   {prod.id === "p_chips" && (
-                    <a 
-                      href="https://shopee.com.br" 
-                      target="_blank" 
+                    <a
+                      href="https://shopee.com.br"
+                      target="_blank"
                       rel="noreferrer"
                       className="flex-1"
                     >
@@ -796,24 +885,22 @@ Que o momento das refeições seja maravilhoso e saudável para o seu bebê!`,
               </CardHeader>
               <CardContent className="p-0 pt-6 space-y-5">
                 {announcements.map((ann) => (
-                  <div 
-                    key={ann.id} 
-                    className={`p-5 rounded-2xl border text-sm leading-relaxed ${
-                      ann.type === "critical" 
+                  <div
+                    key={ann.id}
+                    className={`p-5 rounded-2xl border text-sm leading-relaxed ${ann.type === "critical"
                         ? "bg-red-500/5 border-red-500/20"
                         : ann.type === "tip"
-                        ? "bg-[#D4AF37]/5 border-[#D4AF37]/20"
-                        : "bg-white/5 border-white/5"
-                    }`}
+                          ? "bg-[#D4AF37]/5 border-[#D4AF37]/20"
+                          : "bg-white/5 border-white/5"
+                      }`}
                   >
                     <div className="flex justify-between items-start gap-4 mb-2 flex-wrap">
-                      <h4 className={`font-bold text-xs uppercase tracking-wider ${
-                        ann.type === "critical" 
+                      <h4 className={`font-bold text-xs uppercase tracking-wider ${ann.type === "critical"
                           ? "text-red-400"
                           : ann.type === "tip"
-                          ? "text-[#D4AF37]"
-                          : "text-blue-400"
-                      }`}>
+                            ? "text-[#D4AF37]"
+                            : "text-blue-400"
+                        }`}>
                         {ann.title}
                       </h4>
                       <span className="text-[10px] text-gray-500 font-semibold">{ann.date}</span>
@@ -830,11 +917,11 @@ Que o momento das refeições seja maravilhoso e saudável para o seu bebê!`,
 
           {/* Right Col: Ferramentas, Extensões e links de suporte */}
           <div className="space-y-6">
-            
+
             {/* Suporte Chat Card */}
             <Card className="bg-[#0b1221]/50 backdrop-blur-xl border-white/10 p-6 flex flex-col justify-between h-[210px] relative overflow-hidden group">
               <div className="absolute -right-10 -top-10 w-28 h-28 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-              
+
               <div className="space-y-3 relative z-10">
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
                   <MessageSquare className="w-5 h-5" />
@@ -845,9 +932,9 @@ Que o momento das refeições seja maravilhoso e saudável para o seu bebê!`,
                 </p>
               </div>
 
-              <a 
-                href="https://wa.me/5571988165535" 
-                target="_blank" 
+              <a
+                href="https://wa.me/5571988165535"
+                target="_blank"
                 rel="noreferrer"
                 className="relative z-10 w-full"
               >
@@ -865,15 +952,15 @@ Que o momento das refeições seja maravilhoso e saudável para o seu bebê!`,
                 </h4>
                 <p className="text-[10px] text-gray-450 mt-0.5 font-medium">Ferramentas oficiais citadas no chat.</p>
               </div>
-              
+
               <div className="space-y-4">
                 {tools.map((tool, idx) => (
                   <div key={idx} className="border-b border-white/5 pb-3.5 last:border-0 last:pb-0">
                     <div className="flex justify-between items-center">
                       <span className="text-xs font-bold text-white">{tool.name}</span>
-                      <a 
-                        href={tool.url} 
-                        target="_blank" 
+                      <a
+                        href={tool.url}
+                        target="_blank"
                         rel="noreferrer"
                         className="text-[#D4AF37] hover:underline text-[10px] font-bold flex items-center gap-0.5"
                       >

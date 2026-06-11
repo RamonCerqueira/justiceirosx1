@@ -1,19 +1,24 @@
 import React from "react";
-import { LayoutDashboard, BookOpen, Users, Shield, Trophy, HelpCircle } from "lucide-react";
+import { LayoutDashboard, BookOpen, Users, Shield, Trophy, HelpCircle, GraduationCap } from "lucide-react";
 
 interface SidebarProps {
   activeItem: string;
   onNavigate: (item: string) => void;
   onHome: () => void;
+  isAdmin?: boolean;
 }
 
-export function Sidebar({ activeItem, onNavigate, onHome }: SidebarProps) {
+export function Sidebar({ activeItem, onNavigate, onHome, isAdmin }: SidebarProps) {
   const menuItems = [
     { name: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
     { name: "Trilha de Aulas", icon: <BookOpen className="w-5 h-5" /> },
     { name: "Comunidade", icon: <Users className="w-5 h-5" /> },
     { name: "FAQ", icon: <HelpCircle className="w-5 h-5" /> },
   ];
+
+  if (isAdmin) {
+    menuItems.push({ name: "Alunos (CRM)", icon: <GraduationCap className="w-5 h-5" /> });
+  }
 
   return (
     <div className="w-72 bg-[#0A1128]/60 backdrop-blur-2xl border-r border-white/5 flex flex-col justify-between py-8 h-screen shrink-0 sticky top-0">
