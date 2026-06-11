@@ -66,7 +66,7 @@ export function FAQView() {
   );
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto py-4 text-left animate-fadeIn">
+    <div className="space-y-8 max-w-4xl mx-auto py-4 px-4 sm:px-0 text-left animate-fadeIn">
       {/* Header */}
       <div>
         <h2 className="text-3xl font-black text-white font-heading tracking-wide uppercase">

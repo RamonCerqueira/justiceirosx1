@@ -297,38 +297,38 @@ Que o momento das refeições seja maravilhoso e saudável para o seu bebê!`,
         </div>
 
         {/* Sub-tab Navigation Buttons */}
-        <div className="flex bg-white/5 border border-white/10 p-1.5 rounded-2xl gap-1 shrink-0">
+        <div className="flex flex-wrap md:flex-nowrap bg-white/5 border border-white/10 p-1.5 rounded-2xl gap-1 w-full md:w-auto">
           <Button
             variant="ghost"
             onClick={() => setActiveTab("operations")}
-            className={`h-10 px-4 rounded-xl text-xs font-bold uppercase tracking-wider border-0 cursor-pointer transition-all ${activeTab === "operations"
+            className={`h-10 px-3 sm:px-4 rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-wider border-0 cursor-pointer transition-all flex-1 md:flex-initial justify-center items-center flex ${activeTab === "operations"
                 ? "bg-[#D4AF37] text-[#050914] hover:bg-[#D4AF37] hover:text-[#050914]"
                 : "text-gray-400 hover:text-white hover:bg-white/5"
               }`}
           >
-            <TrendingUp className="w-4 h-4 mr-1.5" />
-            Minha Operação (Privada)
+            <TrendingUp className="w-3.5 h-3.5 mr-1" />
+            Minha Operação
           </Button>
           <Button
             variant="ghost"
             onClick={() => setActiveTab("library")}
-            className={`h-10 px-4 rounded-xl text-xs font-bold uppercase tracking-wider border-0 cursor-pointer transition-all ${activeTab === "library"
+            className={`h-10 px-3 sm:px-4 rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-wider border-0 cursor-pointer transition-all flex-1 md:flex-initial justify-center items-center flex ${activeTab === "library"
                 ? "bg-[#D4AF37] text-[#050914] hover:bg-[#D4AF37] hover:text-[#050914]"
                 : "text-gray-400 hover:text-white hover:bg-white/5"
               }`}
           >
-            <BookOpen className="w-4 h-4 mr-1.5" />
-            Biblioteca de Funis & PDFs
+            <BookOpen className="w-3.5 h-3.5 mr-1" />
+            Funis & PDFs
           </Button>
           <Button
             variant="ghost"
             onClick={() => setActiveTab("notices")}
-            className={`h-10 px-4 rounded-xl text-xs font-bold uppercase tracking-wider border-0 cursor-pointer transition-all ${activeTab === "notices"
+            className={`h-10 px-3 sm:px-4 rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-wider border-0 cursor-pointer transition-all flex-1 md:flex-initial justify-center items-center flex ${activeTab === "notices"
                 ? "bg-[#D4AF37] text-[#050914] hover:bg-[#D4AF37] hover:text-[#050914]"
                 : "text-gray-400 hover:text-white hover:bg-white/5"
               }`}
           >
-            <Bell className="w-4 h-4 mr-1.5" />
+            <Bell className="w-3.5 h-3.5 mr-1" />
             Mural do Grupo
           </Button>
         </div>

@@ -36,6 +36,7 @@ export default function Page() {
   const [modules, setModules] = useState<any[]>([]);
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Admin and Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -392,7 +393,7 @@ export default function Page() {
     : 0;
 
   return (
-    <div className="flex w-full min-h-screen bg-[#050914] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-950/20 via-[#050914] to-[#050914] text-white">
+    <div className="flex w-full min-h-screen bg-[#050914] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-950/20 via-[#050914] to-[#050914] text-white overflow-x-hidden">
       {/* Sidebar Navigation */}
       <Sidebar
         activeItem={activeModule ? "Trilha de Aulas" : currentTab}
@@ -400,13 +401,17 @@ export default function Page() {
           setActiveModule(null);
           setSelectedCourseId(null);
           setCurrentTab(item);
+          setIsMobileMenuOpen(false);
         }}
         onHome={() => {
           setActiveModule(null);
           setSelectedCourseId(null);
           setCurrentTab("Dashboard");
+          setIsMobileMenuOpen(false);
         }}
         isAdmin={isAdmin}
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
       />
 
       {/* Main Container */}
@@ -415,6 +420,7 @@ export default function Page() {
           user={currentUser}
           onLogout={handleLogout}
           progressPercent={progressPercent}
+          onMenuOpen={() => setIsMobileMenuOpen(true)}
         />
 
         <main className="flex-1 p-6 sm:p-10">
