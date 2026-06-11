@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Outfit, Geist } from "next/font/google";
 import "./globals.css";
+import { cn } from "@/lib/utils";
 
-const inter = Inter({ subsets: ["latin"] });
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
   title: "Justiceiros do X1 Academy",
@@ -15,8 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
-      <body className={`${inter.className} bg-navy text-foreground min-h-screen flex antialiased`}>
+    <html lang="pt-BR" className={cn("font-sans dark", geist.variable)}>
+      <body className={`${inter.variable} ${outfit.variable} font-sans min-h-screen antialiased selection:bg-[#D4AF37] selection:text-[#050914]`}>
         {children}
       </body>
     </html>

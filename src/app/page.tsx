@@ -1,495 +1,623 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
-// --- Icons ---
-const BookIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-);
-const GridIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
-);
-const LayersIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 12 12 17 22 12"/><polyline points="2 17 12 22 22 17"/></svg>
-);
-const MonitorPlayIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/><polygon points="10 7 15 10 10 13 10 7"/></svg>
-);
-const FolderIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
-);
-const BarChartIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>
-);
-const TrophyIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-);
-const BellIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-);
-const PlayIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-);
-const SpeakerIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-);
-const CheckIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-);
-const ChessIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v4"/><path d="M9 7h6"/><path d="M10 7v3.5a2.5 2.5 0 0 0 4 0V7"/><path d="M12 10.5V17"/><path d="M8 17h8"/><path d="M7 21h10"/><path d="M12 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/></svg>
-);
+// Custom components
+import { LoginScreen } from "@/components/auth/login-screen";
+import { Sidebar } from "@/components/layout/sidebar";
+import { Topbar } from "@/components/layout/topbar";
+import { CourseCard } from "@/components/dashboard/course-card";
+import { ModuleCard } from "@/components/dashboard/module-card";
+import { ModuleDetails } from "@/components/dashboard/module-details";
+import { CourseDialog } from "@/components/admin/course-dialog";
+import { ModuleDialog } from "@/components/admin/module-dialog";
+import { CommunityView } from "@/components/dashboard/community-view";
+import { FAQView } from "@/components/dashboard/faq-view";
 
-// --- Mocks & Auth ---
-const USERS = [
-  { id: 1, username: "ricardo", password: "x1", name: "Ricardo Menezes", role: "admin" },
-  { id: 2, username: "wil", password: "x1", name: "Wil", role: "admin" },
-  { id: 3, username: "romao", password: "x1", name: "Romão Lucas", role: "admin" },
-  { id: 4, username: "ramon", password: "x1", name: "Ramon", role: "aluno" },
-  { id: 5, username: "ananda", password: "x1", name: "Ananda Tupinamba", role: "aluno" },
-  { id: 6, username: "emerson", password: "x1", name: "Emerson Tavares", role: "aluno" },
-  { id: 7, username: "andreia", password: "x1", name: "Andréia", role: "aluno" },
-  { id: 8, username: "emersonleal", password: "x1", name: "Émerson Leal", role: "aluno" },
-  { id: 9, username: "ismael", password: "x1", name: "Ismael", role: "aluno" },
-  // Alunos genéricos adicionais para completar 15
-  { id: 10, username: "aluno1", password: "x1", name: "Aluno 1", role: "aluno" },
-  { id: 11, username: "aluno2", password: "x1", name: "Aluno 2", role: "aluno" },
-  { id: 12, username: "aluno3", password: "x1", name: "Aluno 3", role: "aluno" },
-  { id: 13, username: "aluno4", password: "x1", name: "Aluno 4", role: "aluno" },
-  { id: 14, username: "aluno5", password: "x1", name: "Aluno 5", role: "aluno" },
-  { id: 15, username: "aluno6", password: "x1", name: "Aluno 6", role: "aluno" },
-];
+// Progress helper
+import { getStudentProgress } from "@/lib/progress";
 
-const MODULES = [
-  { id: 1, title: "O Jogo do X1 e o PAD", progress: 100, completed: true, content: "Bem-vindo ao Jogo do X1. Aqui você aprenderá a base da estratégia Pay After Delivery (PAD). O cliente chega pelo anúncio, o robô atende, entrega o produto e depois você recebe o PIX. A conversão média é de 40%." },
-  { id: 2, title: "O Arsenal (Estrutura)", progress: 80, completed: false, content: "Para iniciar nas vendas de produtos digitais no automático, precisamos ter: Perfil no Facebook, Whatsapp Business, Conta na Infinite Pay e um funil de atendimento." },
-  { id: 3, title: "Garimpando Ouro (Mineração)", progress: 60, completed: false, content: "Encontre produtos milionários na Biblioteca de Anúncios. Pesquise por 'pdf 10,00' ou 'api'. Veja o que a concorrência faz e modele o funil deles." },
-  { id: 4, title: "Automação (O Robô)", progress: 30, completed: false, content: "Nós recomendamos o Leona. O BotPro tem apresentado problemas de instabilidade. Configure seu robô para entregar a isca e fechar a venda de forma automática." },
-  { id: 5, title: "Tráfego e Escala", progress: 0, completed: false, content: "Subindo suas campanhas no Meta Ads. Comece testando criativos em CBO com R$ 15 a R$ 25. Analise as métricas como Custo por Conversa, ROI e escale os vencedores dobrando o orçamento." },
-];
+// Data
+import { STATIC_MODULES, STATIC_COURSES } from "@/lib/course-data";
 
-export default function Dashboard() {
+// Icons
+import { Layers, Play, RefreshCw, PlusCircle, Award, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+
+export default function Page() {
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [activeModule, setActiveModule] = useState<number | null>(null);
-  const [isPlayingTTS, setIsPlayingTTS] = useState(false);
+  const [activeModule, setActiveModule] = useState<any>(null);
+  const [currentTab, setCurrentTab] = useState<string>("Dashboard");
+  const [courses, setCourses] = useState<any[]>([]);
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
+  const [modules, setModules] = useState<any[]>([]);
+  const [completedLessons, setCompletedLessons] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Admin and Modal states
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingModule, setEditingModule] = useState<any>(null);
+  const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
+  const [editingCourse, setEditingCourse] = useState<any>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem("justiceiros_user");
-    if (saved) setCurrentUser(JSON.parse(saved));
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setCurrentUser(parsed);
+      loadUserData(parsed.username);
+    } else {
+      setLoading(false);
+    }
   }, []);
+
+  const loadUserData = async (username: string) => {
+    setLoading(true);
+    await fetchCourses();
+    await fetchModules();
+    await fetchProgress(username);
+    setLoading(false);
+  };
+
+  const fetchCourses = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("courses")
+        .select("*")
+        .order("created_at", { ascending: true });
+        
+      if (error) throw error;
+      setCourses(data || []);
+    } catch (e) {
+      console.error("Error fetching courses:", e);
+    }
+  };
+
+  const fetchModules = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("modules")
+        .select("*")
+        .order("order_num", { ascending: true });
+        
+      if (error) throw error;
+      
+      if (data) {
+        const mapped = data.map((d: any) => ({
+          id: d.id,
+          title: d.title,
+          content: d.content,
+          mediaUrl: d.media_url,
+          order: d.order_num,
+          courseId: d.course_id,
+          attachments: d.attachments || []
+        }));
+        setModules(mapped);
+      } else {
+        setModules([]);
+      }
+    } catch (e) {
+      console.error("Supabase fetch error:", e);
+    }
+  };
+
+  const fetchProgress = async (username: string) => {
+    try {
+      const progress = await getStudentProgress(username);
+      setCompletedLessons(progress);
+    } catch (e) {
+      console.error("Progress fetch error:", e);
+    }
+  };
 
   const handleLogin = (user: any) => {
     setCurrentUser(user);
     localStorage.setItem("justiceiros_user", JSON.stringify(user));
+    loadUserData(user.username);
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
+    setCompletedLessons([]);
+    setActiveModule(null);
     localStorage.removeItem("justiceiros_user");
-    window.speechSynthesis.cancel();
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
   };
+
+  const handleProgressUpdated = async () => {
+    if (currentUser) {
+      await fetchProgress(currentUser.username);
+    }
+  };
+
+  // Admin actions
+  const handleSaveModule = async (
+    title: string,
+    content: string,
+    order: number,
+    courseId: string,
+    file: File | null
+  ) => {
+    let mediaUrl = editingModule?.mediaUrl || "";
+
+    if (file) {
+      const fileName = `${Date.now()}_${file.name}`;
+      const { data, error } = await supabase.storage
+        .from("modules")
+        .upload(fileName, file);
+      if (error) {
+        console.error("Storage upload error:", error);
+        throw error;
+      }
+      
+      const { data: publicUrlData } = supabase.storage
+        .from("modules")
+        .getPublicUrl(fileName);
+      mediaUrl = publicUrlData.publicUrl;
+    }
+
+    const payload = {
+      title,
+      content,
+      media_url: mediaUrl,
+      order_num: order,
+      course_id: courseId,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (editingModule?.id) {
+      const { error } = await supabase
+        .from("modules")
+        .update(payload)
+        .eq("id", editingModule.id);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase
+        .from("modules")
+        .insert({
+          ...payload,
+          attachments: []
+        });
+      if (error) throw error;
+    }
+
+    setIsModalOpen(false);
+    setEditingModule(null);
+    await fetchModules();
+  };
+
+  const handleDeleteModule = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm("Tem certeza que deseja excluir esta aula? Esta ação não pode ser desfeita.")) {
+      try {
+        const { error } = await supabase
+          .from("modules")
+          .delete()
+          .eq("id", id);
+        if (error) throw error;
+        
+        if (activeModule === id) {
+          setActiveModule(null);
+        }
+        await fetchModules();
+      } catch (error) {
+        console.error("Error deleting:", error);
+      }
+    }
+  };
+
+  const handleSaveCourse = async (title: string, description: string) => {
+    const payload = {
+      title,
+      description,
+      updated_at: new Date().toISOString(),
+    };
+
+    try {
+      if (editingCourse?.id) {
+        const { error } = await supabase
+          .from("courses")
+          .update(payload)
+          .eq("id", editingCourse.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("courses")
+          .insert({
+            ...payload,
+            created_at: new Date().toISOString()
+          });
+        if (error) throw error;
+      }
+      setIsCourseModalOpen(false);
+      setEditingCourse(null);
+      await fetchCourses();
+    } catch (error) {
+      console.error("Error saving course:", error);
+      throw error;
+    }
+  };
+
+  const handleDeleteCourse = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm("Tem certeza que deseja excluir este curso e todas as suas aulas? Esta ação não pode ser desfeita.")) {
+      try {
+        const { error } = await supabase
+          .from("courses")
+          .delete()
+          .eq("id", id);
+        if (error) throw error;
+        
+        if (selectedCourseId === id) {
+          setSelectedCourseId(null);
+        }
+        await fetchCourses();
+        await fetchModules();
+      } catch (error) {
+        console.error("Error deleting course:", error);
+      }
+    }
+  };
+
+  const openEditModal = (mod: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingModule(mod);
+    setIsModalOpen(true);
+  };
+
+  const handleSeedDB = async () => {
+    setLoading(true);
+    try {
+      // 1. Clean up existing tables
+      const { error: delModError } = await supabase
+        .from("modules")
+        .delete()
+        .neq("title", "___NON_EXISTENT_TITLE___");
+      if (delModError) throw delModError;
+
+      const { error: delCourseError } = await supabase
+        .from("courses")
+        .delete()
+        .neq("title", "___NON_EXISTENT_TITLE___");
+      if (delCourseError) throw delCourseError;
+
+      // 2. Seed Courses
+      const courseRows = STATIC_COURSES.map((c) => ({
+        id: c.id,
+        title: c.title,
+        description: c.description,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }));
+      const { error: insCourseError } = await supabase
+        .from("courses")
+        .insert(courseRows);
+      if (insCourseError) throw insCourseError;
+
+      // 3. Seed Modules
+      const moduleRows = STATIC_MODULES.map((m) => ({
+        title: m.title,
+        content: m.content,
+        media_url: m.mediaUrl,
+        order_num: m.order,
+        course_id: m.courseId,
+        attachments: m.attachments || [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }));
+      const { error: insModError } = await supabase
+        .from("modules")
+        .insert(moduleRows);
+      if (insModError) throw insModError;
+
+      await fetchCourses();
+      await fetchModules();
+      alert("Sucesso! O banco de dados foi populado com os Cursos e Módulos reais!");
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao popular o banco. Verifique as configurações e políticas do Supabase.");
+    }
+    setLoading(false);
+  };
+
+  // Continue Journey helper
+  const handleContinueJourney = () => {
+    if (modules.length === 0) return;
+    
+    // Find first incomplete module ID
+    const nextIncomplete = modules.find((m) => !completedLessons.includes(m.id));
+    if (nextIncomplete) {
+      setSelectedCourseId(nextIncomplete.courseId);
+      setActiveModule(nextIncomplete.id);
+    } else {
+      // If all modules are complete, open the first one
+      setSelectedCourseId(modules[0].courseId);
+      setActiveModule(modules[0].id);
+    }
+  };
+
+  if (loading && !currentUser) {
+    return (
+      <div className="min-h-screen bg-[#050914] flex flex-col items-center justify-center text-white">
+        <div className="w-12 h-12 border-4 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin mb-4"></div>
+        <p className="text-[#D4AF37] font-semibold tracking-wider animate-pulse">
+          Autenticando e Inicializando...
+        </p>
+      </div>
+    );
+  }
 
   if (!currentUser) {
     return <LoginScreen onLogin={handleLogin} />;
   }
 
-  // --- Funções TTS ---
-  const handleTTS = (text: string) => {
-    if (isPlayingTTS) {
-      window.speechSynthesis.cancel();
-      setIsPlayingTTS(false);
-      return;
-    }
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "pt-BR";
-    utterance.rate = 1.0;
-    utterance.onend = () => setIsPlayingTTS(false);
-    
-    setIsPlayingTTS(true);
-    window.speechSynthesis.speak(utterance);
-  };
+  const isAdmin = currentUser?.role === "admin";
+  const progressPercent = modules.length
+    ? Math.round((completedLessons.length / modules.length) * 100)
+    : 0;
 
-  // --- Telas ---
-  if (activeModule) {
-    const mod = MODULES.find((m) => m.id === activeModule);
-    return (
-      <div className="flex w-full min-h-screen bg-[#F3F4F6] text-[#0A1128] font-sans">
-        <Sidebar activeItem="Aulas" onHome={() => setActiveModule(null)} />
-        <main className="flex-1 flex flex-col p-8 h-screen overflow-y-auto">
-          <button 
-            onClick={() => {
-              window.speechSynthesis.cancel();
-              setIsPlayingTTS(false);
-              setActiveModule(null);
-            }} 
-            className="mb-6 text-sm font-semibold text-gray-500 hover:text-navy"
-          >
-            &larr; Voltar para o Dashboard
-          </button>
-          
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 max-w-4xl mx-auto w-full">
-            <h1 className="text-3xl font-bold text-[#0A1128] mb-2">Módulo {mod?.id}: {mod?.title}</h1>
-            <div className="flex items-center gap-4 mb-8">
-              <span className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full uppercase">
-                {mod?.completed ? "Concluído" : "Em Progresso"}
-              </span>
-              <span className="text-sm text-gray-400">Progresso: {mod?.progress}%</span>
-            </div>
-
-            <div className="bg-[#0A1128] text-white p-6 rounded-xl shadow-inner mb-6 relative">
-              <button 
-                onClick={() => handleTTS(mod?.content || "")}
-                className="absolute top-4 right-4 bg-[#D4AF37] text-[#0A1128] px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-[#F3C623] transition-all"
-              >
-                <SpeakerIcon />
-                {isPlayingTTS ? "Parar Áudio" : "Ouvir Aula"}
-              </button>
-              <h2 className="text-xl font-semibold mb-4 text-[#D4AF37]">Transcrição da Aula</h2>
-              <p className="text-gray-300 leading-relaxed text-lg max-w-2xl">
-                {mod?.content}
-              </p>
-            </div>
-
-            <button className="bg-[#0A1128] text-white px-8 py-3 rounded-xl font-bold hover:bg-[#111A3A] transition-all">
-              Marcar como Concluída
-            </button>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // --- Dashboard Principal ---
   return (
-    <div className="flex w-full min-h-screen bg-[#F3F4F6] font-sans">
-      <Sidebar activeItem="Dashboard" onHome={() => setActiveModule(null)} />
-      
-      <div className="flex-1 flex flex-col h-screen overflow-y-auto">
-        <Topbar user={currentUser} onLogout={handleLogout} />
-        
-        <main className="flex-1 p-8 pt-6 flex gap-8">
-          {/* Conteúdo Central */}
-          <div className="flex-1 flex flex-col gap-8">
-            
-            {/* Hero Section */}
-            <div className="bg-[#0B1221] rounded-2xl p-10 flex relative overflow-hidden shadow-lg border border-[#111A3A]">
-              <div className="z-10 max-w-md relative">
-                <h2 className="text-white text-4xl font-bold leading-tight mb-4">
-                  Seu caminho para dominar<br />o mercado de X1.
-                </h2>
-                <p className="text-gray-400 mb-8 text-lg">
-                  Siga o método. Execute com consistência.<br />Transforme conhecimento em resultados.
-                </p>
-                <button className="bg-[#D4AF37] text-[#0A1128] px-6 py-3 rounded-lg font-bold flex items-center gap-2 hover:bg-[#F3C623] transition-all">
-                  <PlayIcon /> Continuar Aprendendo
-                </button>
-                
-                <div className="mt-12">
-                  <div className="flex justify-between text-sm text-gray-400 mb-2 font-medium">
-                    <span>Seu progresso geral</span>
-                    <span>75% concluído</span>
-                  </div>
-                  <div className="h-2 w-full bg-[#1A2652] rounded-full overflow-hidden">
-                    <div className="h-full bg-[#D4AF37] w-[75%] rounded-full shadow-[0_0_10px_#D4AF37]"></div>
-                  </div>
-                </div>
-              </div>
-              {/* Fake Image Background */}
-              <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-transparent to-[#0B1221] z-0"></div>
-              <div className="absolute top-0 right-0 w-1/2 h-full opacity-40 bg-[url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80')] bg-cover bg-center"></div>
-            </div>
+    <div className="flex w-full min-h-screen bg-[#050914] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-950/20 via-[#050914] to-[#050914] text-white">
+      {/* Sidebar Navigation */}
+      <Sidebar
+        activeItem={activeModule ? "Trilha de Aulas" : currentTab}
+        onNavigate={(item) => {
+          setActiveModule(null);
+          setSelectedCourseId(null);
+          setCurrentTab(item);
+        }}
+        onHome={() => {
+          setActiveModule(null);
+          setSelectedCourseId(null);
+          setCurrentTab("Dashboard");
+        }}
+      />
 
-            {/* Modules Grid */}
-            <div>
-              <div className="flex justify-between items-end mb-4">
-                <h3 className="text-[#0B1221] text-xl font-bold">Seus Módulos</h3>
-                <button className="text-sm font-semibold text-gray-500 hover:text-[#0B1221]">Ver todos os módulos &rarr;</button>
-              </div>
+      {/* Main Container */}
+      <div className="flex-1 flex flex-col h-screen overflow-y-auto relative">
+        <Topbar
+          user={currentUser}
+          onLogout={handleLogout}
+          progressPercent={progressPercent}
+        />
+
+        <main className="flex-1 p-6 sm:p-10">
+          {activeModule ? (
+            /* Detailed view of the selected lesson */
+            <ModuleDetails
+              module={modules.find((m) => m.id === activeModule)!}
+              currentUser={currentUser}
+              isCompleted={completedLessons.includes(activeModule)}
+              onBack={() => setActiveModule(null)}
+              onProgressUpdated={handleProgressUpdated}
+            />
+          ) : currentTab === "Comunidade" ? (
+            /* Community panel view */
+            <CommunityView currentUser={currentUser} />
+          ) : currentTab === "FAQ" ? (
+            /* FAQ panel view */
+            <FAQView />
+          ) : (
+            /* Dashboard Home Panel */
+            <div className="space-y-10 max-w-7xl mx-auto">
               
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                {MODULES.map((mod) => (
-                  <div key={mod.id} className="bg-[#0B1221] border border-[#1A2652] rounded-2xl p-5 flex flex-col justify-between shadow-md hover:-translate-y-1 transition-transform cursor-pointer" onClick={() => setActiveModule(mod.id)}>
+              {/* Hero Banner Section */}
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.2rem] p-8 sm:p-12 flex relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#111A3A]/40 via-transparent to-[#D4AF37]/10 z-0"></div>
+
+                <div className="z-10 max-w-2xl relative space-y-6">
+                  <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-[#D4AF37] text-xs font-bold tracking-widest uppercase shadow-lg">
+                    <Award className="w-3.5 h-3.5 text-[#D4AF37]" /> Método Validado
+                  </span>
+                  
+                  <h2 className="text-4xl sm:text-5xl font-black leading-[1.1] text-white font-heading">
+                    Domine o funil automático <br />
+                    <span className="text-gradient-gold">do WhatsApp X1.</span>
+                  </h2>
+                  
+                  <p className="text-gray-300 text-base sm:text-lg font-light leading-relaxed max-w-xl">
+                    Aprenda a moldar ofertas, automatizar atendimentos e escalar seus lucros no Pix. Execute o plano, colha os resultados.
+                  </p>
+
+                  <Button
+                    onClick={handleContinueJourney}
+                    disabled={modules.length === 0}
+                    className="h-12 px-8 rounded-xl flex items-center gap-2 text-md btn-gold font-bold uppercase tracking-wider border-0 cursor-pointer"
+                  >
+                    <Play className="w-4 h-4 fill-current" /> Continuar Jornada
+                  </Button>
+                </div>
+
+                {/* Decorative golden circle blur */}
+                <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-[#D4AF37]/10 rounded-full blur-[120px] group-hover:bg-[#D4AF37]/15 transition-all duration-1000"></div>
+              </div>
+
+              {/* Catalog or Lesson Trail Header */}
+              {selectedCourseId === null ? (
+                /* COURSE CATALOG VIEW */
+                <>
+                  <div id="trilha-secao" className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-6">
                     <div>
-                      <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Módulo 0{mod.id}</p>
-                      <h4 className="text-white font-bold leading-tight min-h-[40px]">{mod.title}</h4>
-                      <div className="my-6 text-[#D4AF37] flex justify-center opacity-80">
-                        {/* Fake Module Icon */}
-                        <ChessIcon />
+                      <h3 className="text-2xl sm:text-3xl font-bold text-white font-heading">
+                        Catálogo de Cursos
+                      </h3>
+                      <p className="text-gray-400 text-sm mt-1">
+                        Selecione um curso para acessar as aulas e trilhas de aprendizado.
+                      </p>
+                    </div>
+
+                    {/* Admin controls and Seeding */}
+                    {isAdmin && (
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Button
+                          onClick={handleSeedDB}
+                          disabled={loading}
+                          className="bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 text-emerald-400 font-bold text-xs h-10 px-5 rounded-xl cursor-pointer border-0"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5 mr-1.5 animate-spin" style={{ animationDuration: '6s' }} />
+                          Salvar dados do sistema
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setEditingCourse(null);
+                            setIsCourseModalOpen(true);
+                          }}
+                          className="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold text-xs h-10 px-5 rounded-xl cursor-pointer"
+                        >
+                          <PlusCircle className="w-3.5 h-3.5 mr-1.5 text-[#D4AF37]" />
+                          Adicionar Novo Curso
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Courses Catalog Grid */}
+                  {loading ? (
+                    <div className="flex flex-col items-center justify-center py-24">
+                      <div className="w-10 h-10 border-4 border-[#D4AF37]/20 border-t-[#D4AF37] rounded-full animate-spin mb-4"></div>
+                      <p className="text-[#D4AF37] text-xs font-semibold animate-pulse tracking-wide">
+                        Carregando Cursos...
+                      </p>
+                    </div>
+                  ) : courses.length === 0 ? (
+                    /* Empty state */
+                    <div className="border-2 border-dashed border-white/10 bg-white/5 backdrop-blur-md rounded-[2.2rem] p-16 flex flex-col items-center justify-center text-center max-w-2xl mx-auto space-y-6">
+                      <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#D4AF37]">
+                        <Layers className="w-8 h-8" />
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="text-lg font-bold text-white">Nenhum curso cadastrado</h4>
+                        <p className="text-gray-400 text-xs leading-relaxed">
+                          O banco de dados está limpo. {isAdmin ? "Como administrador, clique no botão verde 'Salvar dados do sistema' acima para importar o curso de vendas padrão." : "Solicite ao administrador para carregar a grade de cursos."}
+                        </p>
                       </div>
                     </div>
-                    
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {courses.map((course) => {
+                        const modulesCount = modules.filter(m => m.courseId === course.id).length;
+                        return (
+                          <CourseCard
+                            key={course.id}
+                            course={{ ...course, modulesCount }}
+                            isAdmin={isAdmin}
+                            onSelect={(id) => setSelectedCourseId(id)}
+                            onEdit={(c, e) => {
+                              e.stopPropagation();
+                              setEditingCourse(c);
+                              setIsCourseModalOpen(true);
+                            }}
+                            onDelete={handleDeleteCourse}
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
+              ) : (
+                /* COURSE LESSON TRAIL VIEW */
+                <>
+                  <div id="trilha-secao" className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-6 text-left">
                     <div>
-                      <div className="flex justify-between text-xs text-gray-400 mb-1 font-medium">
-                        <span>{mod.progress}%</span>
+                      <Button
+                        variant="ghost"
+                        onClick={() => setSelectedCourseId(null)}
+                        className="text-xs font-bold text-gray-400 hover:text-white mb-2 pl-0 hover:bg-transparent cursor-pointer border-0"
+                      >
+                        ← Voltar ao Catálogo de Cursos
+                      </Button>
+                      <h3 className="text-2xl sm:text-3xl font-bold text-white font-heading">
+                        {courses.find(c => c.id === selectedCourseId)?.title}
+                      </h3>
+                      <p className="text-gray-400 text-sm mt-1 font-light">
+                        Assista às aulas práticas e configure a sua estrutura operacional.
+                      </p>
+                    </div>
+
+                    {/* Admin controls to add lessons inside this course */}
+                    {isAdmin && (
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Button
+                          onClick={() => {
+                            setEditingModule(null);
+                            setIsModalOpen(true);
+                          }}
+                          className="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold text-xs h-10 px-5 rounded-xl cursor-pointer"
+                        >
+                          <PlusCircle className="w-3.5 h-3.5 mr-1.5 text-[#D4AF37]" />
+                          Adicionar Nova Aula
+                        </Button>
                       </div>
-                      <div className="h-1.5 w-full bg-[#1A2652] rounded-full mb-4 overflow-hidden">
-                        <div className="h-full bg-[#D4AF37] rounded-full" style={{ width: `${mod.progress}%` }}></div>
+                    )}
+                  </div>
+
+                  {/* Modules Trail Grid for this Course */}
+                  {loading ? (
+                    <div className="flex flex-col items-center justify-center py-24">
+                      <div className="w-10 h-10 border-4 border-[#D4AF37]/20 border-t-[#D4AF37] rounded-full animate-spin mb-4"></div>
+                      <p className="text-[#D4AF37] text-xs font-semibold animate-pulse tracking-wide">
+                        Buscando aulas...
+                      </p>
+                    </div>
+                  ) : modules.filter(m => m.courseId === selectedCourseId).length === 0 ? (
+                    /* Empty state */
+                    <div className="border-2 border-dashed border-white/10 bg-white/5 backdrop-blur-md rounded-[2.2rem] p-16 flex flex-col items-center justify-center text-center max-w-2xl mx-auto space-y-6">
+                      <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#D4AF37]">
+                        <Play className="w-8 h-8" />
                       </div>
-                      
-                      {mod.completed ? (
-                        <button className="w-full py-2 rounded-lg border border-green-500/30 text-green-400 font-semibold text-sm flex items-center justify-center gap-2 bg-green-500/10">
-                          Concluído <CheckIcon />
-                        </button>
-                      ) : mod.progress === 0 ? (
-                        <button className="w-full py-2 rounded-lg border border-[#23315E] text-white font-semibold text-sm hover:bg-[#1A2652]">
-                          Começar
-                        </button>
-                      ) : (
-                        <button className="w-full py-2 rounded-lg bg-[#D4AF37] text-[#0A1128] font-bold text-sm hover:bg-[#F3C623]">
-                          Continuar
-                        </button>
-                      )}
+                      <div className="space-y-2">
+                        <h4 className="text-lg font-bold text-white">Nenhuma aula cadastrada neste curso</h4>
+                        <p className="text-gray-400 text-xs leading-relaxed">
+                          {isAdmin ? "Como administrador, clique no botão 'Adicionar Nova Aula' acima para criar a primeira aula desse curso." : "Este curso ainda não possui aulas cadastradas."}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Continue de onde parou */}
-            <div>
-              <h3 className="text-[#0B1221] text-xl font-bold mb-4">Continue de onde parou</h3>
-              <div className="bg-white border border-gray-200 rounded-2xl p-4 flex items-center gap-6 shadow-sm">
-                <div className="w-32 h-20 bg-gray-200 rounded-xl overflow-hidden">
-                  <img src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80" alt="Aula thumbnail" className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-xs text-gray-500 font-bold mb-1">Módulo 2: O Arsenal (Estrutura)</p>
-                  <h4 className="text-[#0B1221] font-bold">Aula 4: Configurando sua Conta na InfinitePay</h4>
-                  <div className="flex items-center gap-4 mt-3">
-                    <div className="h-1.5 w-48 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-[#D4AF37] w-[65%] rounded-full"></div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {modules
+                        .filter(m => m.courseId === selectedCourseId)
+                        .map((mod, index) => (
+                          <ModuleCard
+                            key={mod.id}
+                            module={mod}
+                            index={index}
+                            isAdmin={isAdmin}
+                            isCompleted={completedLessons.includes(mod.id)}
+                            onSelect={(id) => setActiveModule(id)}
+                            onEdit={openEditModal}
+                            onDelete={handleDeleteModule}
+                          />
+                        ))}
                     </div>
-                    <span className="text-xs text-gray-400 font-medium">65% concluído</span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-2 border-l border-gray-100 pl-6">
-                  <button className="bg-[#D4AF37] text-[#0A1128] px-5 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-[#F3C623]">
-                    <PlayIcon /> Continuar Aula
-                  </button>
-                  <span className="text-xs text-gray-400">Último acesso: Hoje, 14:30</span>
-                </div>
-              </div>
+                  )}
+                </>
+              )}
             </div>
-
-          </div>
-
-          {/* Right Panel */}
-          <div className="w-[320px] flex flex-col gap-6">
-            
-            {/* Progresso Widget */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-              <h3 className="text-[#0B1221] font-bold mb-6">Seu Progresso</h3>
-              <div className="flex justify-center mb-6 relative">
-                <svg width="120" height="120" viewBox="0 0 120 120">
-                  <circle cx="60" cy="60" r="50" fill="none" stroke="#F3F4F6" strokeWidth="12" />
-                  <circle cx="60" cy="60" r="50" fill="none" stroke="#0B1221" strokeWidth="12" strokeDasharray="314" strokeDashoffset="78.5" className="origin-center -rotate-90 transition-all duration-1000" />
-                  {/* Gold part */}
-                  <circle cx="60" cy="60" r="50" fill="none" stroke="#D4AF37" strokeWidth="12" strokeDasharray="314" strokeDashoffset="280" className="origin-center -rotate-90 transition-all duration-1000" />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl font-bold text-[#0B1221]">75%</span>
-                  <span className="text-xs text-gray-500">Concluído</span>
-                </div>
-              </div>
-              <div className="flex flex-col gap-3 text-sm mb-6">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Módulos concluídos</span>
-                  <span className="font-semibold text-[#0B1221]">2/5</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Aulas concluídas</span>
-                  <span className="font-semibold text-[#0B1221]">18/24</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Horas de estudo</span>
-                  <span className="font-semibold text-[#0B1221]">12h 45m</span>
-                </div>
-              </div>
-              <button className="w-full py-2 rounded-lg border border-gray-300 text-gray-600 font-semibold text-sm hover:bg-gray-50">
-                Ver meu progresso completo
-              </button>
-            </div>
-
-            {/* Upcoming Classes */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-              <h3 className="text-[#0B1221] font-bold mb-4">Próximas Aulas</h3>
-              <div className="flex flex-col gap-4 mb-6">
-                {[
-                  { m: "2", a: "5", t: "Criando Links de Pagamento" },
-                  { m: "2", a: "6", t: "Configurações Avançadas" },
-                  { m: "3", a: "1", t: "Introdução à Mineração" },
-                ].map((item, i) => (
-                  <div key={i} className="flex gap-3 items-center group cursor-pointer">
-                    <div className="w-8 h-8 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] flex items-center justify-center group-hover:bg-[#D4AF37] group-hover:text-white transition-colors">
-                      <PlayIcon />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 font-bold">Módulo {item.m} - Aula {item.a}</p>
-                      <p className="text-sm font-semibold text-[#0B1221]">{item.t}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <button className="w-full py-2 rounded-lg border border-gray-300 text-gray-600 font-semibold text-sm hover:bg-gray-50">
-                Ver todas as aulas
-              </button>
-            </div>
-
-          </div>
+          )}
         </main>
       </div>
+
+      {/* Admin Dialog Form Modal (Modules) */}
+      <ModuleDialog
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        moduleToEdit={editingModule}
+        courses={courses}
+        onSave={handleSaveModule}
+        totalModulesCount={modules.length}
+      />
+
+      {/* Admin Dialog Form Modal (Courses) */}
+      <CourseDialog
+        open={isCourseModalOpen}
+        onOpenChange={setIsCourseModalOpen}
+        courseToEdit={editingCourse}
+        onSave={handleSaveCourse}
+      />
     </div>
   );
 }
-
-// --- Componentes Compartilhados ---
-
-function Sidebar({ activeItem, onHome }: { activeItem: string, onHome: () => void }) {
-  const menuItems = [
-    { name: "Dashboard", icon: <GridIcon /> },
-    { name: "Módulos", icon: <LayersIcon /> },
-    { name: "Aulas", icon: <MonitorPlayIcon /> },
-    { name: "Materiais Extras", icon: <FolderIcon /> },
-    { name: "Meu Progresso", icon: <BarChartIcon /> },
-    { name: "Certificados", icon: <TrophyIcon /> },
-  ];
-
-  return (
-    <div className="w-64 bg-[#0B1221] flex flex-col justify-between py-6 border-r border-[#111A3A] text-gray-300">
-      <div>
-        <div className="px-6 mb-8 cursor-pointer" onClick={onHome}>
-          <h1 className="text-xl font-black text-white flex items-center gap-2">
-            <ShieldIcon /> JUSTICEIROS
-          </h1>
-          <p className="text-[#D4AF37] text-xs font-bold tracking-[0.2em] ml-8 mt-1">ACADEMY</p>
-        </div>
-        
-        <nav className="flex flex-col gap-1 px-3">
-          {menuItems.map((item) => (
-            <button
-              key={item.name}
-              onClick={item.name === "Dashboard" ? onHome : undefined}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${
-                activeItem === item.name 
-                ? "bg-[#D4AF37] text-[#0A1128] shadow-md shadow-[#D4AF37]/20" 
-                : "hover:bg-[#111A3A] hover:text-white"
-              }`}
-            >
-              {item.icon}
-              {item.name}
-            </button>
-          ))}
-        </nav>
-      </div>
-
-      <div className="px-6">
-        <div className="bg-[#111A3A] rounded-xl p-5 border border-[#1A2652]">
-          <span className="text-[#D4AF37] text-2xl font-serif leading-none">"</span>
-          <p className="text-sm font-medium text-white mb-2 leading-relaxed">
-            Disciplina hoje,<br/>liberdade amanhã.
-          </p>
-          <p className="text-xs text-gray-500">— Justiceiros do X1</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Topbar({ user, onLogout }: { user: any, onLogout: () => void }) {
-  const initials = user?.name ? user.name.substring(0, 2).toUpperCase() : "AJ";
-  
-  return (
-    <header className="h-20 bg-[#0B1221] border-b border-[#111A3A] px-8 flex items-center justify-between text-white sticky top-0 z-20">
-      <div>
-        <h2 className="font-bold text-lg">Bem-vindo(a), {user?.name || "Aluno"}</h2>
-        <p className="text-xs text-gray-400">Foque no processo, o resultado é consequência.</p>
-      </div>
-      
-      <div className="flex items-center gap-6">
-        <button className="relative text-gray-400 hover:text-white transition-colors">
-          <BellIcon />
-          <span className="absolute -top-1 -right-1 bg-[#D4AF37] text-[#0A1128] text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-[#0B1221]">3</span>
-        </button>
-        
-        <div className="flex items-center gap-3 cursor-pointer pl-6 border-l border-[#1A2652]" onClick={onLogout} title="Clique para sair">
-          <div className="w-10 h-10 rounded-full bg-[#D4AF37] text-[#0A1128] flex items-center justify-center font-bold text-lg">
-            {initials}
-          </div>
-          <span className="font-medium text-sm">{user?.name} &darr;</span>
-        </div>
-      </div>
-    </header>
-  );
-}
-
-// --- Tela de Login ---
-function LoginScreen({ onLogin }: { onLogin: (user: any) => void }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const foundUser = USERS.find(u => u.username === username.toLowerCase() && u.password === password);
-    if (foundUser) {
-      onLogin(foundUser);
-    } else {
-      setError("Usuário ou senha incorretos.");
-    }
-  };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0B1221] bg-[url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80')] bg-cover bg-center">
-      <div className="absolute inset-0 bg-[#0B1221]/90 backdrop-blur-sm"></div>
-      
-      <div className="relative z-10 bg-[#111A3A] p-10 rounded-3xl shadow-2xl border border-[#1A2652] max-w-md w-full mx-4">
-        <div className="flex flex-col items-center mb-8">
-          <ShieldIcon />
-          <h1 className="text-2xl font-black text-white mt-4 tracking-wider">JUSTICEIROS</h1>
-          <p className="text-[#D4AF37] text-xs font-bold tracking-[0.3em]">ACADEMY</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          {error && <p className="text-red-400 text-sm text-center font-medium bg-red-400/10 py-2 rounded-lg">{error}</p>}
-          
-          <div>
-            <label className="text-sm font-semibold text-gray-400 mb-1 block">Usuário</label>
-            <input 
-              type="text" 
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full bg-[#0B1221] border border-[#1A2652] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
-              placeholder="Ex: ramon"
-            />
-          </div>
-          
-          <div>
-            <label className="text-sm font-semibold text-gray-400 mb-1 block">Senha</label>
-            <input 
-              type="password" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-[#0B1221] border border-[#1A2652] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
-              placeholder="Sua senha (x1)"
-            />
-          </div>
-
-          <button 
-            type="submit"
-            className="w-full bg-[#D4AF37] text-[#0A1128] font-bold text-lg py-3 rounded-xl mt-4 hover:bg-[#F3C623] transition-all shadow-[0_0_15px_rgba(212,175,55,0.3)]"
-          >
-            Acessar Plataforma
-          </button>
-        </form>
-        
-        <p className="text-center text-xs text-gray-500 mt-6">
-          Acesso exclusivo para os 15 membros.<br/>Senha padrão: <strong>x1</strong>
-        </p>
-      </div>
-    </div>
-  );
-}
-
-const ShieldIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-);

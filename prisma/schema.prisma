@@ -1,0 +1,51 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Progress {
+  username          String   @id
+  completed_lessons Json     @default("[]")
+  updated_at        DateTime @default(now()) @updatedAt
+
+  @@map("progress")
+}
+
+model Operations {
+  username   String   @id
+  entries    Json     @default("[]")
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@map("operations")
+}
+
+model Course {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  description String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+  modules     Module[]
+
+  @@map("courses")
+}
+
+model Module {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  course_id   String   @db.Uuid
+  course      Course   @relation(fields: [course_id], references: [id], onDelete: Cascade)
+  title       String
+  content     String
+  media_url   String?
+  order_num   Int
+  attachments Json     @default("[]")
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+
+  @@map("modules")
+}
